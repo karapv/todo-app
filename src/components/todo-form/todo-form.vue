@@ -43,6 +43,7 @@
     @import "todo-form"
 </style>
 <script lang="ts">
+    import {mapGetters} from "vuex";
     export default {
         name: 'TodoForm',
         data(){
@@ -55,15 +56,32 @@
                 currentTask: null,
                 isTask: false,
                 checkTitle: false,
-                checkTask: false
+                checkTask: false,
+                confirmPopup: false
             }
+        },
+        computed:{
+          ...mapGetters([
+              'getPopup'
+          ])
         },
         watch:{
          'todo.tasks': function(arr){
              if(arr.length>0){
                  this.isTask = true;
              }
-         }
+         },
+         'getPopup': function (popup) {
+             if(popup.confirm){
+              const newTask: [{id: number; text: string; done: boolean}] = this.todo.tasks.filter((item)=>{
+                  if(item.id !== popup.id){
+                      return item
+                  }
+              });
+              this.todo.tasks = newTask;
+              localStorage.currentTodo = JSON.stringify(newTask);
+             }
+         }   
         },
         mounted(){
           if(localStorage.currentTodo){
@@ -96,10 +114,7 @@
                }
             },
             removeTask(id: number): void{
-                const idx: number = this.todo.tasks.findIndex((item) => item.id === id),
-                      newTask: [{id: number; text: string; done: boolean}] = [this.todo.tasks.slice(0,idx),this.todo.tasks.slice(idx+1)];
-                this.todo.tasks = newTask;
-                localStorage.currentTodo = JSON.stringify(newTask);
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
             },
             createTodo(e: { preventDefault: () => void }): void{
                 e.preventDefault();
@@ -113,9 +128,8 @@
                     this.checkTitle = false;
                     this.checkTask = false;
                     const currentDate = new Date(),
-                           id: number =  currentDate.getTime()+2,
-                          {title,tasks} = this.todo;
-                    this.$store.dispatch('CreateTask',{id,title, tasks});
+                           id: number =  currentDate.getTime()+2;
+                    this.$store.dispatch('CreateTask',{id:id ,title: this.todo.title, tasks: this.todo.tasks});
                     localStorage.currentTodo = '';
                     this.todo = {
                         id: '',

@@ -12,8 +12,12 @@
   background: #555
 html,body,#app
   height: 100%
+#app
+  position: relative
 .grid-container
   display: grid
+.flex-container
+  display: flex
 //Buttons
 .btns
   border-radius: 50%
@@ -33,3 +37,8 @@ html,body,#app
   font-size: 13px
   padding-left: 14px
   margin-top: 5px
+//Animations
+.list-enter-active, .list-leave-active
+  transition: all 500ms
+.list-enter, .list-leave-to
+  opacity: 0

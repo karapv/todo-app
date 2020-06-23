@@ -1,0 +1,26 @@
+.popup
+  position: fixed
+  top: 0
+  right: 0
+  left: 0
+  bottom: 0
+  z-index: 2
+  background-color: #00000066
+  display: none
+  &.active
+    display: block
+.popup-container
+  height: 100%
+  justify-content: center
+  align-items: center
+.confirm-popup
+  background-color: #fff
+  border-radius: 5px
+  padding: 15px
+  min-width: 300px
+  max-width: 320px
+  text-align: center
+.confirm-popup-btns
+  margin-top: 40px
+  grid-template-columns: repeat(2,1fr)
+  grid-gap: 30px

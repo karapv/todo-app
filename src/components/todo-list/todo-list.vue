@@ -1,29 +1,29 @@
 <template>
     <div class="container todo-list">
-        <div class="row">
+            <transition-group name="list" class="row" tag="div">
             <div class="col-lg-12 todo-list-item" v-for="todo in getTodos" :key="todo.id">
                 <div class="todo-list-item-container">
                     <header class="grid-container todo-list-item-header">
                         <h4 class="todo-list-item-title">{{todo.title}}</h4>
                         <div class="grid-container todo-list-item-buttons">
                             <div class="btns btn-change"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
-                            <div class="btns btn-delete"><vue-fontawesome icon="trash"></vue-fontawesome></div>
+                            <div class="btns btn-delete" @click="deleteTodo(todo.id)"><vue-fontawesome icon="trash"></vue-fontawesome></div>
                         </div>
                     </header>
                     <footer class="todo-list-item-footer">
-                        <ul class="todo-list-goals">
-                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, 2)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}"><vue-fontawesome icon="check"></vue-fontawesome></span> {{tasks.text}}</li>
+                        <ul class="todo-list-goals" >
+                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, todo.tasks.length>1?2:1)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}"><vue-fontawesome icon="check"></vue-fontawesome></span> {{tasks.text}}</li>
                         </ul>
                     </footer>
                 </div>
             </div>
-        </div>
+            </transition-group>
     </div>
 </template>
 <style lang="sass">
     @import "todo-list"
 </style>
-<script>
+<script lang="ts">
     import { mapGetters } from 'vuex';
     export default {
         name: 'TodoList',
@@ -34,8 +34,27 @@
         },
         computed:{
             ...mapGetters([
-                'getTodos'
+                'getTodos',
+                'getPopup'
             ])
+        },
+        watch: {
+            'getPopup': function (popup) {
+                if(popup.confirm){
+                    const newTodos: [{id: number; title: string; todos: [{id: number; text: string; done: boolean}]}]= this.getTodos.filter((item)=>{
+                        if(item.id !== popup.id){
+                            return item
+                        }
+                    });
+                    this.$store.dispatch('changeTodo', newTodos);
+                }
+            }
+        },
+        methods:{
+            deleteTodo(id: number): void {
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
+            }
         }
+
     }
 </script>
