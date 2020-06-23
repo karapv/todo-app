@@ -13,6 +13,7 @@ export default new Vuex.Store({
     popup: {enable: false, confirm: false,id: null}
   },
   getters:{
+    //Get todos
     getTodos: (state): { id: number; title: string; tasks: { id: number; text: string; done: boolean }[] }[] => {
       if(typeof state.todos === 'string') {
         const fromJson = JSON.parse(state.todos);
@@ -21,9 +22,11 @@ export default new Vuex.Store({
         return state.todos;
       }
     },
+    //Get popup data
     getPopup: state => state.popup
   },
   mutations: {
+    //Create task
     CreateTask:(state,todo): void=>{
       const oldTodo = typeof state.todos === 'string'?JSON.parse(state.todos):state.todos,
             currentTodo = [...oldTodo,todo],
@@ -31,9 +34,11 @@ export default new Vuex.Store({
       localStorage.todos = toJson;
       state.todos = localStorage.todos;
     },
+    //Change Popup
     changePopup: (state: [{enable: boolean; confirm: boolean; id: null}],popup: [{enable: boolean; confirm: boolean; id: null}]): void=>{
       state.popup = popup;
     },
+    //Change Todo
     changeTodo: (state,todos)=>{
       const toJson = JSON.stringify(todos);
       localStorage.todos = toJson;
@@ -41,12 +46,15 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    //Create task
     CreateTask:(content,todo: [{id: number; title: string; tasks: [{ id: number; text: string; done: boolean }]}]): void=>{
       content.commit('CreateTask',todo);
     },
+    //Change Popup
     changePopup: (content, popup: [{enable: boolean; confirm: boolean; id: null}]): void=>{
       content.commit('changePopup',popup);
     },
+    //Change Todo
     changeTodo: (content, todos)=>{
       content.commit('changeTodo',todos);
     }

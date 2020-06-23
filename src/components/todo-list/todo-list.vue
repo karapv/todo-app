@@ -6,7 +6,7 @@
                     <header class="grid-container todo-list-item-header">
                         <h4 class="todo-list-item-title">{{todo.title}}</h4>
                         <div class="grid-container todo-list-item-buttons">
-                            <div class="btns btn-change"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
+                            <div class="btns btn-change" @click="viewTodo(todo.id)"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
                             <div class="btns btn-delete" @click="deleteTodo(todo.id)"><vue-fontawesome icon="trash"></vue-fontawesome></div>
                         </div>
                     </header>
@@ -25,6 +25,7 @@
 </style>
 <script lang="ts">
     import { mapGetters } from 'vuex';
+    import router from '@/router';
     export default {
         name: 'TodoList',
         data(){
@@ -53,6 +54,9 @@
         methods:{
             deleteTodo(id: number): void {
                 this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
+            },
+            viewTodo(id: number): void{
+                router.push({path: `/todo/${id}`});
             }
         }
 

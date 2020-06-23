@@ -4,17 +4,17 @@
             <b-form class="col-lg-12 todo-form" @submit="createTodo($event)">
                 <h4 class="todo-form-title">Create new Todo</h4>
                 <b-form-group
-                                    id="input-group-1"
-                                    label="Title"
-                                    label-for="input-1"
-                                    class="todo-form-label"
-                        >
+                        id="input-group-1"
+                        label="Title"
+                        label-for="input-1"
+                        class="todo-form-label"
+                >
                     <b-form-input
-                                    id="input-1"
-                                    v-model.lazy="todo.title"
-                                    type="text"
-                                    placeholder="Enter title for your todo"
-                                    class="todo-form-input"
+                            id="input-1"
+                            v-model.lazy="todo.title"
+                            type="text"
+                            placeholder="Enter title for your todo"
+                            class="todo-form-input"
                     ></b-form-input>
                     <p class="error" v-show="checkTitle">You must add a title.</p>
                 </b-form-group>
@@ -26,6 +26,7 @@
                                 placeholder="Text..."
                                 v-model.lazy="currentTask"
                         ></b-form-textarea>
+                        <p class="error" v-show="checkTask">You must add a task.</p>
                     </div>
                     <b-button variant="success" class="todo-form-add" @click="addNewTask"><vue-fontawesome icon="plus"></vue-fontawesome></b-button>
                 </div>
@@ -71,6 +72,7 @@
                  this.isTask = true;
              }
          },
+          //open popup
          'getPopup': function (popup) {
              if(popup.confirm){
               const newTask: [{id: number; text: string; done: boolean}] = this.todo.tasks.filter((item)=>{
@@ -113,9 +115,11 @@
                   this.checkTask = true;
                }
             },
+            // Remove task
             removeTask(id: number): void{
                 this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
             },
+            //Createw new todo
             createTodo(e: { preventDefault: () => void }): void{
                 e.preventDefault();
                 const currentTodoTitle = [...this.todo.title],

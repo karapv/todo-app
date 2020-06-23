@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home/Home.vue'
+import Todo from "@/views/Todo/Todo.vue";
 
 Vue.use(VueRouter);
 
@@ -10,6 +11,11 @@ Vue.use(VueRouter);
     name: 'Home',
     component: Home
   },
+  {
+    path: '/todo/:id',
+    name: 'Todo',
+    component: Todo
+  }
 ];
 
 const router = new VueRouter({
