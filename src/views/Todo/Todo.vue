@@ -20,16 +20,33 @@
                         ></b-form-input>
                         <p class="error" v-show="checkTitle">You must add a title.</p>
                     </b-form-group>
-                    <div class="btns btn-change"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
+                    <div class="todo-btns-container">
+                        <span class="btns btn-change btn-todo btn-todo-change"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                        <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                    </div>
                 </div>
+                <ul class="task-list">
+                        <li class="grid-container task-list-item" v-for="task in currentTodo.tasks" :key="task.id">
+                            <span :class="{'task-check': true,'done': task.done,'btn-todo btn-todo-done': true}" @click="taskDone(task.id)"><vue-fontawesome icon="check"></vue-fontawesome></span>
+                            <b-form-textarea type="text" class="task-text" v-model="task.text" disabled></b-form-textarea>
+                            <div class="todo-btns-container">
+                                <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                                <span class="btns btn-change btn-todo btn-todo-change"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                                <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                            </div>
+                        </li>
+                </ul>
                 <div class="grid-container todo-item">
-                    <label for="textarea-default" class="todo-form-label">Add your task</label>
-                    <b-form-textarea
-                            id="textarea-default"
-                            placeholder="Text..."
-                            v-model.lazy="newTask"
-                    ></b-form-textarea>
-                    <p class="error" v-show="checkTask">You must add a title.</p>
+                    <div class="todo-task-area">
+                        <label for="textarea-default" class="todo-form-label">Add your task</label>
+                        <b-form-textarea
+                                id="textarea-default"
+                                placeholder="Text..."
+                                v-model="newTask"
+                        ></b-form-textarea>
+                        <p class="error" v-show="checkTask">You must add a task.</p>
+                    </div>
+                    <span class="btns btn-save btn-todo btn-save" ><vue-fontawesome icon="plus"></vue-fontawesome></span>
                 </div>
             </div>
 
@@ -37,7 +54,7 @@
     </div>
 </template>
 <style  lang="sass">
-
+@import "Todo"
 </style>
 <script lang="ts">
     import {mapGetters} from "vuex";
@@ -48,7 +65,8 @@
                currentTodo: [],
                newTask: '',
                checkTitle: false,
-               checkTask: false
+               checkTask: false,
+               saveChanges: false
             }
         },
         computed:{
@@ -60,6 +78,16 @@
             const currentId = +this.$route.params.id;
             const idx = this.getTodos.findIndex((item)=>item.id === currentId);
             this.currentTodo = this.getTodos[idx];
+        },
+        methods:{
+            taskDone(id: number): void{
+                 const newTodo = this.currentTodo.tasks.filter((item)=>{
+                     if(item.id === id){
+                         item.done = true;
+                     }
+                 });
+                 this.$store.dispatch('changeTodo',newTodo);
+            }
         }
     }
 </script>

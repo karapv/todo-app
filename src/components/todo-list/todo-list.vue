@@ -12,7 +12,8 @@
                     </header>
                     <footer class="todo-list-item-footer">
                         <ul class="todo-list-goals" >
-                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, todo.tasks.length>1?2:1)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}"><vue-fontawesome icon="check"></vue-fontawesome></span> {{tasks.text}}</li>
+                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, todo.tasks.length>1?2:1)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}">
+                                <vue-fontawesome icon="check"></vue-fontawesome></span> {{tasks.text}}</li>
                         </ul>
                     </footer>
                 </div>
@@ -47,7 +48,7 @@
                             return item
                         }
                     });
-                    this.$store.dispatch('changeTodo', newTodos);
+                    this.$store.dispatch('removeTodo', newTodos);
                 }
             }
         },

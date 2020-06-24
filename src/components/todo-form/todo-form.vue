@@ -28,7 +28,7 @@
                         ></b-form-textarea>
                         <p class="error" v-show="checkTask">You must add a task.</p>
                     </div>
-                    <b-button variant="success" class="todo-form-add" @click="addNewTask"><vue-fontawesome icon="plus"></vue-fontawesome></b-button>
+                    <span  class="btns btn-save" @click="addNewTask"><vue-fontawesome icon="plus"></vue-fontawesome></span>
                 </div>
                 <div class="todo-form-goals-container" v-if="isTask">
                     <ol class="todo-form-goals">

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, {ActionContext} from 'vuex'
 
 Vue.use(Vuex);
 
@@ -14,7 +14,7 @@ export default new Vuex.Store({
   },
   getters:{
     //Get todos
-    getTodos: (state): { id: number; title: string; tasks: { id: number; text: string; done: boolean }[] }[] => {
+    getTodos: (state): { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] } => {
       if(typeof state.todos === 'string') {
         const fromJson = JSON.parse(state.todos);
         return fromJson;
@@ -38,8 +38,8 @@ export default new Vuex.Store({
     changePopup: (state: [{enable: boolean; confirm: boolean; id: null}],popup: [{enable: boolean; confirm: boolean; id: null}]): void=>{
       state.popup = popup;
     },
-    //Change Todo
-    changeTodo: (state,todos)=>{
+    //Remove Todo
+    removeTodo: (state,todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
       const toJson = JSON.stringify(todos);
       localStorage.todos = toJson;
       state.todos = localStorage.todos;
@@ -54,9 +54,11 @@ export default new Vuex.Store({
     changePopup: (content, popup: [{enable: boolean; confirm: boolean; id: null}]): void=>{
       content.commit('changePopup',popup);
     },
-    //Change Todo
-    changeTodo: (content, todos)=>{
-      content.commit('changeTodo',todos);
-    }
+    //Remove Todo
+    removeTodo: (content, todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
+      content.commit('removeTodo',todos);
+    },
+    //Do task is done
+
   }
 })
