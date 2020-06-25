@@ -32,7 +32,10 @@
                             <div class="todo-btns-container">
                                 <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
                                 <span class="btns btn-change btn-todo btn-todo-change"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
-                                <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                                <span class="btns btn-delete btn-todo btn-todo-delete hidden-btn" ><vue-fontawesome icon="times"></vue-fontawesome></span>
+                                <span class="btns btn-todo btn-todo-undo hidden-btn"><vue-fontawesome icon="undo"></vue-fontawesome></span>
+                                <span  class="btns btn-todo btn-todo-backward hidden-btn"><vue-fontawesome icon="backward"></vue-fontawesome></span>
+                                <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="check"></vue-fontawesome></span>
                             </div>
                         </li>
                 </ul>
@@ -79,14 +82,20 @@
             const idx = this.getTodos.findIndex((item)=>item.id === currentId);
             this.currentTodo = this.getTodos[idx];
         },
+        watch:{
+          'getTodos' :function () {
+                const currentId = +this.$route.params.id;
+                const idx = this.getTodos.findIndex((item)=>item.id === currentId);
+                this.currentTodo = this.getTodos[idx];
+          }
+
+        },
         methods:{
             taskDone(id: number): void{
-                 const newTodo = this.currentTodo.tasks.filter((item)=>{
-                     if(item.id === id){
-                         item.done = true;
-                     }
-                 });
-                 this.$store.dispatch('changeTodo',newTodo);
+                 const idx = this.currentTodo.tasks.findIndex((item)=>item.id === id);
+                 this.currentTodo.tasks[idx].done =  !this.currentTodo.tasks[idx].done;
+                 console.log(this.currentTodo);
+                 this.$store.dispatch('taskDone',this.currentTodo);
             }
         }
     }

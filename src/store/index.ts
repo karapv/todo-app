@@ -43,6 +43,15 @@ export default new Vuex.Store({
       const toJson = JSON.stringify(todos);
       localStorage.todos = toJson;
       state.todos = localStorage.todos;
+    },
+    //Do task is done
+    taskDone:(state,task)=>{
+      const currentState = typeof state.todos === 'string'?JSON.parse(state.todos):state.todos,
+            idx = currentState.findIndex((item)=>item.id === task.id);
+      currentState[idx] = task;
+      const toJson = JSON.stringify(currentState);
+      localStorage.todos = toJson;
+      state.todos = localStorage.todos;
     }
   },
   actions: {
@@ -59,6 +68,8 @@ export default new Vuex.Store({
       content.commit('removeTodo',todos);
     },
     //Do task is done
-
+    taskDone: (content, task)=>{
+      content.commit('taskDone',task);
+    }
   }
 })
