@@ -41,17 +41,17 @@
                                 placeholder="Text..."
                                 v-model="newTask"
                         ></b-form-textarea>
-                        <p class="error" v-show="checkTask">You must add a task.</p>
+                        <p class="error" v-show="checkTask">You must add text in task.</p>
                     </div>
-                    <span class="btns btn-save btn-todo btn-save" ><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                    <span class="btns btn-save btn-todo btn-save" @click="createNewTask"><vue-fontawesome icon="plus"></vue-fontawesome></span>
                 </div>
                 <div class="grid-container todo-buttons">
                     <span  class="btns btn-save btn-todo btn-todo-save" @click="saveTodo">
                         <vue-fontawesome icon="save" v-show="!saveChanges"></vue-fontawesome>
                         <vue-fontawesome icon="check" v-show="saveChanges"></vue-fontawesome>
                     </span>
-                    <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
-                    <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="times"></vue-fontawesome></span>
+                    <span class="btns btn-delete btn-todo" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                    <span class="btns btn-cancel btn-todo" @click="cancelChanges"><vue-fontawesome icon="times"></vue-fontawesome></span>
                     <span class="btns btn-todo btn-todo-undo"><vue-fontawesome icon="undo"></vue-fontawesome></span>
                     <span  class="btns btn-todo btn-todo-backward"><vue-fontawesome icon="backward"></vue-fontawesome></span>
                 </div>
@@ -69,13 +69,14 @@
         data(){
             return{
                currentTodo: [],
-               titleText: '',
+               version: localStorage.version?localStorage.version:0,
                newTask: '',
                checkTitle: false,
                enableTitle: false,
                checkTask: false,
                saveChanges: false,
-               taskDelete: {id:null,delete:false}
+               taskDelete: {id:null,delete:false},
+               cancelChange: false
             }
         },
         computed:{
@@ -88,6 +89,13 @@
             const currentId = +this.$route.params.id;
             const idx = this.getTodos.findIndex((item)=>item.id === currentId);
             this.currentTodo = this.getTodos[idx];
+            if(localStorage.version){
+                localStorage.removeItem('version');
+            }
+            localStorage.version = this.version++;
+            const currentVersions = [{version:this.version,todos:this.currentTodo}];
+            const toJSON = JSON.stringify(currentVersions);
+            localStorage.versionsTodo = toJSON;
         },
         watch:{
           'getTodos' :function () {
@@ -97,7 +105,6 @@
           },
           'getPopup': function(popup){
               if(popup.confirm) {
-                  console.log(this.taskDelete.delete)
                   if(this.taskDelete.delete) {
                       this.currentTodo.tasks = this.currentTodo.tasks.filter((item) => {
                           if (item.id !== this.taskDelete.id) {
@@ -105,10 +112,20 @@
                           }
                       });
                       this.taskDelete.delete = false;
+                  }else if(this.cancelChange){
+                      const oldObj = JSON.parse(localStorage.versionsTodo);
+                      this.currentTodo = oldObj[0].todos;
+                      this.cancelChange = false;
                   }
               }
-          }
-
+          },
+        },
+        beforeUpdate(){
+            localStorage.version = this.version++;
+            const oldVersion = JSON.parse(localStorage.versionsTodo);
+            const newObj = [...oldVersion,{version:this.version,todos:this.currentTodo}];
+            const toJSON = JSON.stringify(newObj);
+            localStorage.versionsTodo = toJSON;
         },
         methods:{
             //Do task is done
@@ -127,16 +144,47 @@
             //Delete task
             deleteTask(id: number): void{
                 this.taskDelete = {id: id,delete: true};
-                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false});
             },
+            //Create new task
+            createNewTask(): void{
+                const checkText = [...this.newTask];
+                if(checkText.length>0){
+                    this.checkTask = false;
+                    const currentText: string = this.newTask,
+                        currentDate = new Date(),
+                        id: number = currentDate.getTime()+2,
+                        oldObj: [{id: number; text: string; done: boolean}] = this.currentTodo.tasks,
+                        newObj: [{id: number; text: string; done: boolean}] = {
+                            id,
+                            text: currentText,
+                            done: false
+                        },
+                        currentTask: [{id: number; text: string; done: boolean}] = [...oldObj,newObj];
+                    this.currentTodo.tasks = currentTask;
+                    this.currentTask = '';
+                }else {
+                    this.checkTask = true;
+                }
+            },
+            cancelChanges(){
+                this.cancelChange = true;
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false});
+            },
+            //Save todo
             saveTodo(): void{
-                const checkTitle = [...this.titleText];
+                const checkTitle = [...this.currentTodo.title];
                 if(checkTitle.length === 0){
                     this.checkTitle = true;
                 }else{
+                    document.querySelectorAll('.task-text').forEach((item)=>{
+                        item.setAttribute('disabled','disabled');
+                    });
                     this.checkTitle = false;
                     this.saveChanges = !this.saveChanges;
                     this.$store.dispatch('saveTodo',this.currentTodo);
+                    localStorage.remove('version');
+                    localStorage.remove('versionsTodo');
                 }
 
             }
