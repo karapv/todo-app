@@ -74,12 +74,14 @@
                checkTitle: false,
                enableTitle: false,
                checkTask: false,
-               saveChanges: false
+               saveChanges: false,
+               taskDelete: {id:null,delete:false}
             }
         },
         computed:{
             ...mapGetters([
                 'getTodos',
+                'getPopup'
             ])
         },
         created(): void {
@@ -92,6 +94,19 @@
                 const currentId = +this.$route.params.id;
                 const idx = this.getTodos.findIndex((item)=>item.id === currentId);
                 this.currentTodo = this.getTodos[idx];
+          },
+          'getPopup': function(popup){
+              if(popup.confirm) {
+                  console.log(this.taskDelete.delete)
+                  if(this.taskDelete.delete) {
+                      this.currentTodo.tasks = this.currentTodo.tasks.filter((item) => {
+                          if (item.id !== this.taskDelete.id) {
+                              return item;
+                          }
+                      });
+                      this.taskDelete.delete = false;
+                  }
+              }
           }
 
         },
@@ -111,15 +126,19 @@
             },
             //Delete task
             deleteTask(id: number): void{
-                this.currentTodo.tasks = this.currentTodo.tasks.filter((item)=>{
-                    if(item.id !== id){
-                        return item;
-                    }
-                });
+                this.taskDelete = {id: id,delete: true};
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
             },
             saveTodo(): void{
-                this.saveChanges = !this.saveChanges;
-                this.$store.dispatch('saveTodo',this.currentTodo);
+                const checkTitle = [...this.titleText];
+                if(checkTitle.length === 0){
+                    this.checkTitle = true;
+                }else{
+                    this.checkTitle = false;
+                    this.saveChanges = !this.saveChanges;
+                    this.$store.dispatch('saveTodo',this.currentTodo);
+                }
+
             }
         }
     }
