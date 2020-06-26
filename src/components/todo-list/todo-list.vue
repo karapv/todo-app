@@ -53,9 +53,11 @@
             }
         },
         methods:{
+            //Delete Todo
             deleteTodo(id: number): void {
                 this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false,id: id});
             },
+            // View todo
             viewTodo(id: number): void{
                 router.push({path: `/todo/${id}`});
             }

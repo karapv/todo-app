@@ -6,9 +6,9 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     todos: localStorage.todos?localStorage.todos:[
-      {id: 1,title: 'Todo 1',tasks:[{id:1,text: 'My goal',done: false},{id:2,text: 'My goal',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
-      {id: 2,title: 'Todo 2',tasks:[{id:1,text: 'My goal',done: false},{id:2,text: 'My goal',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
-      {id: 3,title: 'Todo 3',tasks:[{id:1,text: 'My goal',done: false},{id:2,text: 'My goal',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
+      {id: 1,title: 'Todo 1',tasks:[{id:1,text: 'My goal 1',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
+      {id: 2,title: 'Todo 2',tasks:[{id:1,text: 'My goal ',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
+      {id: 3,title: 'Todo 3',tasks:[{id:1,text: 'My goal 1',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
     ],
     popup: {enable: false, confirm: false,id: null}
   },
@@ -45,10 +45,10 @@ export default new Vuex.Store({
       state.todos = localStorage.todos;
     },
     //Do task is done
-    taskDone:(state,task)=>{
+    saveTodo:(state,todo)=>{
       const currentState = typeof state.todos === 'string'?JSON.parse(state.todos):state.todos,
-            idx = currentState.findIndex((item)=>item.id === task.id);
-      currentState[idx] = task;
+            idx = currentState.findIndex((item)=>item.id === todo.id);
+      currentState[idx] = todo;
       const toJson = JSON.stringify(currentState);
       localStorage.todos = toJson;
       state.todos = localStorage.todos;
@@ -67,9 +67,9 @@ export default new Vuex.Store({
     removeTodo: (content, todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
       content.commit('removeTodo',todos);
     },
-    //Do task is done
-    taskDone: (content, task)=>{
-      content.commit('taskDone',task);
+    //Save Todo
+    saveTodo: (content, todo)=>{
+      content.commit('saveTodo',todo);
     }
   }
 })

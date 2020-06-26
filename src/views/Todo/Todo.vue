@@ -12,30 +12,24 @@
                     >
                         <b-form-input
                                 id="input-1"
-                                v-model.lazy="currentTodo.title"
-                                :value="currentTodo.title"
+                                v-model="currentTodo.title"
                                 type="text"
                                 class="todo-form-input"
-                                disabled
+                                :disabled="!enableTitle"
                         ></b-form-input>
                         <p class="error" v-show="checkTitle">You must add a title.</p>
                     </b-form-group>
                     <div class="todo-btns-container">
-                        <span class="btns btn-change btn-todo btn-todo-change"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
-                        <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                        <span class="btns btn-change btn-todo btn-todo-change" @click="changeText('enableTitle',enableTitle)"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                     </div>
                 </div>
                 <ul class="task-list">
                         <li class="grid-container task-list-item" v-for="task in currentTodo.tasks" :key="task.id">
                             <span :class="{'task-check': true,'done': task.done,'btn-todo btn-todo-done': true}" @click="taskDone(task.id)"><vue-fontawesome icon="check"></vue-fontawesome></span>
-                            <b-form-textarea type="text" class="task-text" v-model="task.text" disabled></b-form-textarea>
+                            <b-form-textarea type="text" :class="['task-text',`task-number-${task.id}`]" v-model="task.text" disabled></b-form-textarea>
                             <div class="todo-btns-container">
-                                <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
-                                <span class="btns btn-change btn-todo btn-todo-change"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
-                                <span class="btns btn-delete btn-todo btn-todo-delete hidden-btn" ><vue-fontawesome icon="times"></vue-fontawesome></span>
-                                <span class="btns btn-todo btn-todo-undo hidden-btn"><vue-fontawesome icon="undo"></vue-fontawesome></span>
-                                <span  class="btns btn-todo btn-todo-backward hidden-btn"><vue-fontawesome icon="backward"></vue-fontawesome></span>
-                                <span  class="btns btn-save btn-todo btn-todo-save hidden-btn"><vue-fontawesome icon="check"></vue-fontawesome></span>
+                                <span class="btns btn-delete btn-todo btn-todo-delete" @click="deleteTask(task.id)"><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                                <span class="btns btn-change btn-todo btn-todo-change" @click="changeText(task.id)"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                             </div>
                         </li>
                 </ul>
@@ -51,8 +45,17 @@
                     </div>
                     <span class="btns btn-save btn-todo btn-save" ><vue-fontawesome icon="plus"></vue-fontawesome></span>
                 </div>
+                <div class="grid-container todo-buttons">
+                    <span  class="btns btn-save btn-todo btn-todo-save" @click="saveTodo">
+                        <vue-fontawesome icon="save" v-show="!saveChanges"></vue-fontawesome>
+                        <vue-fontawesome icon="check" v-show="saveChanges"></vue-fontawesome>
+                    </span>
+                    <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                    <span class="btns btn-delete btn-todo btn-todo-delete" ><vue-fontawesome icon="times"></vue-fontawesome></span>
+                    <span class="btns btn-todo btn-todo-undo"><vue-fontawesome icon="undo"></vue-fontawesome></span>
+                    <span  class="btns btn-todo btn-todo-backward"><vue-fontawesome icon="backward"></vue-fontawesome></span>
+                </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -66,8 +69,10 @@
         data(){
             return{
                currentTodo: [],
+               titleText: '',
                newTask: '',
                checkTitle: false,
+               enableTitle: false,
                checkTask: false,
                saveChanges: false
             }
@@ -91,11 +96,30 @@
 
         },
         methods:{
+            //Do task is done
             taskDone(id: number): void{
                  const idx = this.currentTodo.tasks.findIndex((item)=>item.id === id);
                  this.currentTodo.tasks[idx].done =  !this.currentTodo.tasks[idx].done;
-                 console.log(this.currentTodo);
-                 this.$store.dispatch('taskDone',this.currentTodo);
+            },
+            //Change text
+            changeText(property: string,value: boolean|string = 'disabled'): void{
+                if(value !== 'disabled') {
+                    this.$data[property] = !value;
+                }else{
+                    document.querySelector(`.task-number-${property}`).toggleAttribute('disabled');
+                }
+            },
+            //Delete task
+            deleteTask(id: number): void{
+                this.currentTodo.tasks = this.currentTodo.tasks.filter((item)=>{
+                    if(item.id !== id){
+                        return item;
+                    }
+                });
+            },
+            saveTodo(): void{
+                this.saveChanges = !this.saveChanges;
+                this.$store.dispatch('saveTodo',this.currentTodo);
             }
         }
     }
