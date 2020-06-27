@@ -52,8 +52,8 @@
                     </span>
                     <span class="btns btn-delete btn-todo" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
                     <span class="btns btn-cancel btn-todo" @click="cancelChanges"><vue-fontawesome icon="times"></vue-fontawesome></span>
-                    <span class="btns btn-todo btn-todo-undo"><vue-fontawesome icon="undo"></vue-fontawesome></span>
-                    <span  class="btns btn-todo btn-todo-backward"><vue-fontawesome icon="backward"></vue-fontawesome></span>
+                    <span class="btns btn-todo btn-todo-undo" @click="returnVersion"><vue-fontawesome icon="undo"></vue-fontawesome></span>
+                    <span  class="btns btn-todo btn-todo-backward" @click="returnChanges"><vue-fontawesome icon="backward"></vue-fontawesome></span>
                 </div>
             </div>
         </div>
@@ -76,7 +76,9 @@
                checkTask: false,
                saveChanges: false,
                taskDelete: {id:null,delete:false},
-               cancelChange: false
+               cancelChange: false,
+               previosVersion: 0,
+               previosChanges: 0
             }
         },
         computed:{
@@ -91,6 +93,9 @@
             this.currentTodo = this.getTodos[idx];
             if(localStorage.version){
                 localStorage.removeItem('version');
+            }
+            if(localStorage.versionsTodo){
+                localStorage.removeItem('versionTodo');
             }
             localStorage.version = this.version++;
             const currentVersions = [{version:this.version,todos:this.currentTodo}];
@@ -167,9 +172,41 @@
                     this.checkTask = true;
                 }
             },
-            cancelChanges(){
+            cancelChanges(): void{
                 this.cancelChange = true;
                 this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false});
+            },
+            //Return changes
+            returnChanges(): void{
+              if(localStorage.versionsTodo) {
+                  const fromJson = JSON.parse(localStorage.versionsTodo);
+                  if(this.previosVersion === 0){
+                      this.previosVersion = fromJson[fromJson.length-1].version;
+                  }
+                  if(this.previosVersion>1){
+                      this.previosChanges = this.previosVersion;
+                      this.previosVersion = this.previosVersion -1;
+                      const idx = fromJson.findIndex((item)=>item.version == this.previosVersion);
+                      this.currentTodo = fromJson[idx].todos;
+                      console.log(`PrevV:${this.previosVersion}`);
+                  }
+              }
+            },
+            //Return previos version
+            returnVersion(): void{
+                if(localStorage.versionsTodo){
+                    const fromJson = JSON.parse(localStorage.versionsTodo);
+                    if(this.previosChanges === 0){
+                        this.previosChanges = fromJson[fromJson.length-1].version;
+                    }
+                    if(this.previosChanges<=fromJson[fromJson.length-1].version){
+                        this.previosChanges = this.previosVersion+=1;
+                        this.previosVersion = this.previosChanges;
+                        const idx = fromJson.findIndex((item)=>item.version == this.previosChanges);
+                        this.currentTodo = fromJson[idx].todos;
+                        console.log(`PrevC:${this.previosChanges}`);
+                    }
+                }
             },
             //Save todo
             saveTodo(): void{
