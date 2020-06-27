@@ -95,17 +95,21 @@
         created(): void {
             const currentId = +this.$route.params.id;
             const idx = this.getTodos.findIndex((item)=>item.id === currentId);
-            this.currentTodo = this.getTodos[idx];
-            if(localStorage.version){
-                localStorage.removeItem('version');
+            if(idx === -1){
+                router.push({ name: 'NotFound' });
+            }else {
+                this.currentTodo = this.getTodos[idx];
+                if (localStorage.version) {
+                    localStorage.removeItem('version');
+                }
+                if (localStorage.versionsTodo) {
+                    localStorage.removeItem('versionTodo');
+                }
+                localStorage.version = this.version++;
+                const currentVersions = [{version: this.version, todos: this.currentTodo}];
+                const toJSON = JSON.stringify(currentVersions);
+                localStorage.versionsTodo = toJSON;
             }
-            if(localStorage.versionsTodo){
-                localStorage.removeItem('versionTodo');
-            }
-            localStorage.version = this.version++;
-            const currentVersions = [{version:this.version,todos:this.currentTodo}];
-            const toJSON = JSON.stringify(currentVersions);
-            localStorage.versionsTodo = toJSON;
         },
         watch:{
           'getTodos' :function () {

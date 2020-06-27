@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home/Home.vue'
 import Todo from "@/views/Todo/Todo.vue";
-
+import NotFound from "@/views/NotFound/NotFound";
 Vue.use(VueRouter);
 
   const routes: Array<RouteConfig> = [
@@ -15,6 +15,15 @@ Vue.use(VueRouter);
     path: '/todo/:id',
     name: 'Todo',
     component: Todo
+  },
+  {
+    path: '/404',
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
+     path: '*',
+     redirect: '/404'
   }
 ];
 
