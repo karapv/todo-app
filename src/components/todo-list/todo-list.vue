@@ -6,13 +6,13 @@
                     <header class="grid-container todo-list-item-header">
                         <h4 class="todo-list-item-title">{{todo.title}}</h4>
                         <div class="grid-container todo-list-item-buttons">
-                            <div class="btns btn-change" @click="viewTodo(todo.id)"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
-                            <div class="btns btn-delete" @click="deleteTodo(todo.id)"><vue-fontawesome icon="trash"></vue-fontawesome></div>
+                            <div class="btns btn-change" @click="viewTodo(todo.id)" v-b-tooltip.hover title="View todo"><vue-fontawesome icon="pencil"></vue-fontawesome></div>
+                            <div class="btns btn-delete" @click="deleteTodo(todo.id)" v-b-tooltip.hover title="Delete todo"><vue-fontawesome icon="trash"></vue-fontawesome></div>
                         </div>
                     </header>
                     <footer class="todo-list-item-footer">
                         <ul class="todo-list-goals" >
-                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, todo.tasks.length>1?2:1)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}">
+                            <li class="todo-list-goals-item" v-for="tasks in todo.tasks.slice(0, todo.tasks.length>1?2:1)"  :key="tasks.id"><span :class="{'task-check': true,'done': tasks.done}" v-b-tooltip.hover title="Do task is done">
                                 <vue-fontawesome icon="check"></vue-fontawesome></span> {{tasks.text}}</li>
                         </ul>
                     </footer>
@@ -27,6 +27,8 @@
 <script lang="ts">
     import { mapGetters } from 'vuex';
     import router from '@/router';
+    import Helper from "@/helpers/helper";
+    const helper = new Helper();
     export default {
         name: 'TodoList',
         data(){
@@ -43,12 +45,7 @@
         watch: {
             'getPopup': function (popup) {
                 if(popup.confirm){
-                    const newTodos: [{id: number; title: string; todos: [{id: number; text: string; done: boolean}]}]= this.getTodos.filter((item)=>{
-                        if(item.id !== popup.id){
-                            return item
-                        }
-                    });
-                    this.$store.dispatch('removeTodo', newTodos);
+                    this.$store.dispatch('removeTodo', helper.deleteItem(this.getTodos,popup));
                 }
             }
         },

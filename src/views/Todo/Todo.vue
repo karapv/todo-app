@@ -2,6 +2,7 @@
     <div class="container todo">
         <div class="row">
             <div class="col-lg-12">
+                <span class="btns  btn-todo  btn-back" @click="backToHome" v-b-tooltip.right.hover title="Back to home page"><vue-fontawesome icon="home"></vue-fontawesome></span>
                 <h1 class="todo-title">Edit Todo</h1>
                 <div class="grid-container todo-item">
                     <b-form-group
@@ -20,16 +21,16 @@
                         <p class="error" v-show="checkTitle">You must add a title.</p>
                     </b-form-group>
                     <div class="todo-btns-container">
-                        <span class="btns btn-change btn-todo btn-todo-change" @click="changeText('enableTitle',enableTitle)"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                        <span class="btns btn-change btn-todo btn-todo-change" @click="changeText('enableTitle',enableTitle)" v-b-tooltip.hover title="Change title"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                     </div>
                 </div>
                 <ul class="task-list">
                         <li class="grid-container task-list-item" v-for="task in currentTodo.tasks" :key="task.id">
-                            <span :class="{'task-check': true,'done': task.done,'btn-todo btn-todo-done': true}" @click="taskDone(task.id)"><vue-fontawesome icon="check"></vue-fontawesome></span>
+                            <span :class="{'task-check': true,'done': task.done,'btn-todo btn-todo-done': true}" @click="taskDone(task.id)" v-b-tooltip.hover title="Do task is done"><vue-fontawesome icon="check"></vue-fontawesome></span>
                             <b-form-textarea type="text" :class="['task-text',`task-number-${task.id}`]" v-model="task.text" disabled></b-form-textarea>
                             <div class="todo-btns-container">
-                                <span class="btns btn-delete btn-todo btn-todo-delete" @click="deleteTask(task.id)"><vue-fontawesome icon="trash"></vue-fontawesome></span>
-                                <span class="btns btn-change btn-todo btn-todo-change" @click="changeText(task.id)"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                                <span class="btns btn-delete btn-todo btn-todo-delete" @click="deleteTask(task.id)" v-b-tooltip.hover title="Delete Task"><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                                <span class="btns btn-change btn-todo btn-todo-change" @click="changeText(task.id)" v-b-tooltip.hover title="Change text in task"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                             </div>
                         </li>
                 </ul>
@@ -43,17 +44,17 @@
                         ></b-form-textarea>
                         <p class="error" v-show="checkTask">You must add text in task.</p>
                     </div>
-                    <span class="btns btn-save btn-todo btn-save" @click="createNewTask"><vue-fontawesome icon="plus"></vue-fontawesome></span>
+                    <span class="btns btn-save btn-todo btn-save" @click="createNewTask" v-b-tooltip.hover title="Add new task"><vue-fontawesome icon="plus"></vue-fontawesome></span>
                 </div>
                 <div class="grid-container todo-buttons">
-                    <span  class="btns btn-save btn-todo btn-todo-save" @click="saveTodo">
+                    <span  class="btns btn-save btn-todo btn-todo-save" @click="saveTodo" v-b-tooltip.hover title="Save changes">
                         <vue-fontawesome icon="save" v-show="!saveChanges"></vue-fontawesome>
                         <vue-fontawesome icon="check" v-show="saveChanges"></vue-fontawesome>
                     </span>
-                    <span class="btns btn-delete btn-todo" ><vue-fontawesome icon="trash"></vue-fontawesome></span>
-                    <span class="btns btn-cancel btn-todo" @click="cancelChanges"><vue-fontawesome icon="times"></vue-fontawesome></span>
-                    <span class="btns btn-todo btn-todo-undo" @click="returnVersion"><vue-fontawesome icon="undo"></vue-fontawesome></span>
-                    <span  class="btns btn-todo btn-todo-backward" @click="returnChanges"><vue-fontawesome icon="backward"></vue-fontawesome></span>
+                    <span class="btns btn-delete btn-todo" @click="deleteTodo" v-b-tooltip.hover title="Delete Todo"><vue-fontawesome icon="trash"></vue-fontawesome></span>
+                    <span class="btns btn-cancel btn-todo" @click="cancelChanges" v-b-tooltip.hover title="Cancel  changes"><vue-fontawesome icon="times"></vue-fontawesome></span>
+                    <span class="btns btn-todo btn-todo-undo" @click="returnVersion" v-b-tooltip.hover title="Cancel previos changes"><vue-fontawesome icon="undo"></vue-fontawesome></span>
+                    <span  class="btns btn-todo btn-todo-backward" @click="returnChanges" v-b-tooltip.hover title="Previous changes"><vue-fontawesome icon="backward"></vue-fontawesome></span>
                 </div>
             </div>
         </div>
@@ -64,6 +65,9 @@
 </style>
 <script lang="ts">
     import {mapGetters} from "vuex";
+    import router from "@/router";
+    import Helper from "@/helpers/helper";
+    const helper = new Helper();
     export default {
         name: "Todo",
         data(){
@@ -75,10 +79,11 @@
                enableTitle: false,
                checkTask: false,
                saveChanges: false,
+               isDelete: false,
                taskDelete: {id:null,delete:false},
                cancelChange: false,
-               previosVersion: 0,
-               previosChanges: 0
+               previousVersion: 0,
+               previousChanges: 0
             }
         },
         computed:{
@@ -111,6 +116,7 @@
           'getPopup': function(popup){
               if(popup.confirm) {
                   if(this.taskDelete.delete) {
+                      //Confirm task delete
                       this.currentTodo.tasks = this.currentTodo.tasks.filter((item) => {
                           if (item.id !== this.taskDelete.id) {
                               return item;
@@ -118,9 +124,21 @@
                       });
                       this.taskDelete.delete = false;
                   }else if(this.cancelChange){
+                      //Confirm cancel changes
                       const oldObj = JSON.parse(localStorage.versionsTodo);
                       this.currentTodo = oldObj[0].todos;
                       this.cancelChange = false;
+                  }else if(this.isDelete){
+                      //Confirm todo delete
+                      const newTodos: [{id: number; title: string; todos: [{id: number; text: string; done: boolean}]}]= this.getTodos.filter((item)=>{
+                          if(item.id !== this.currentTodo.id){
+                              return item
+                          }
+                      });
+                      localStorage.removeItem('version');
+                      localStorage.removeItem('versionsTodo');
+                      this.$store.dispatch('removeTodo', newTodos);
+                      router.push({ name: 'Home' });
                   }
               }
           },
@@ -133,6 +151,12 @@
             localStorage.versionsTodo = toJSON;
         },
         methods:{
+            //Back to home page
+            backToHome(): void{
+                localStorage.removeItem('version');
+                localStorage.removeItem('versionsTodo');
+                router.push({ name: 'Home' });
+            },
             //Do task is done
             taskDone(id: number): void{
                  const idx = this.currentTodo.tasks.findIndex((item)=>item.id === id);
@@ -157,8 +181,7 @@
                 if(checkText.length>0){
                     this.checkTask = false;
                     const currentText: string = this.newTask,
-                        currentDate = new Date(),
-                        id: number = currentDate.getTime()+2,
+                        id: number = helper.generateId(),
                         oldObj: [{id: number; text: string; done: boolean}] = this.currentTodo.tasks,
                         newObj: [{id: number; text: string; done: boolean}] = {
                             id,
@@ -180,15 +203,15 @@
             returnChanges(): void{
               if(localStorage.versionsTodo) {
                   const fromJson = JSON.parse(localStorage.versionsTodo);
-                  if(this.previosVersion === 0){
-                      this.previosVersion = fromJson[fromJson.length-1].version;
+                  if(this.previousVersion === 0){
+                      this.previousVersion = fromJson[fromJson.length-1].version;
                   }
-                  if(this.previosVersion>1){
-                      this.previosChanges = this.previosVersion;
-                      this.previosVersion = this.previosVersion -1;
-                      const idx = fromJson.findIndex((item)=>item.version == this.previosVersion);
+                  if(this.previousVersion>1){
+                      this.previousChanges = this.previousVersion;
+                      this.previousVersion = this.previousVersion -1;
+                      const idx = fromJson.findIndex((item)=>item.version == this.previousVersion);
                       this.currentTodo = fromJson[idx].todos;
-                      console.log(`PrevV:${this.previosVersion}`);
+                      console.log(`PrevV:${this.previousVersion}`);
                   }
               }
             },
@@ -196,15 +219,14 @@
             returnVersion(): void{
                 if(localStorage.versionsTodo){
                     const fromJson = JSON.parse(localStorage.versionsTodo);
-                    if(this.previosChanges === 0){
-                        this.previosChanges = fromJson[fromJson.length-1].version;
+                    if(this.previousChanges === 0){
+                        this.previousChanges = fromJson[fromJson.length-1].version;
                     }
-                    if(this.previosChanges<=fromJson[fromJson.length-1].version){
-                        this.previosChanges = this.previosVersion+=1;
-                        this.previosVersion = this.previosChanges;
-                        const idx = fromJson.findIndex((item)=>item.version == this.previosChanges);
+                    if(this.previousChanges<=fromJson[fromJson.length-1].version){
+                        this.previousChanges = this.previousVersion+=1;
+                        this.previousVersion = this.previousChanges;
+                        const idx = fromJson.findIndex((item)=>item.version == this.previousChanges);
                         this.currentTodo = fromJson[idx].todos;
-                        console.log(`PrevC:${this.previosChanges}`);
                     }
                 }
             },
@@ -220,10 +242,15 @@
                     this.checkTitle = false;
                     this.saveChanges = !this.saveChanges;
                     this.$store.dispatch('saveTodo',this.currentTodo);
-                    localStorage.remove('version');
-                    localStorage.remove('versionsTodo');
+                    localStorage.removeItem('version');
+                    localStorage.removeItem('versionsTodo');
                 }
 
+            },
+            //Delete todo
+            deleteTodo(): void{
+                this.isDelete = true;
+                this.$store.dispatch('changePopup',{enable: true, confirm: false, cancel: false});
             }
         }
     }

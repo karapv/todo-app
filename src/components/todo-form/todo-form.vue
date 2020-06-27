@@ -35,7 +35,7 @@
                         <li class="todo-form-goals-item" v-for="task in todo.tasks" :key="task.id">{{task.text}} <span class="todo-form-goals-btn" @click="removeTask(task.id)"><vue-fontawesome icon="times"></vue-fontawesome></span></li>
                     </ol>
                 </div>
-                <input type="submit"  class="btn btn-success todo-form-btn-submit" value="Create Todo">
+                <input type="submit"  class="btn btn-success todo-form-btn-submit" value="Create Todo" v-b-tooltip.hover title="Create todo">
             </b-form>
         </div>
     </div>
@@ -45,6 +45,8 @@
 </style>
 <script lang="ts">
     import {mapGetters} from "vuex";
+    import Helper from "@/helpers/helper";
+    const helper = new Helper();
     export default {
         name: 'TodoForm',
         data(){
@@ -75,13 +77,8 @@
           //open popup
          'getPopup': function (popup) {
              if(popup.confirm){
-              const newTask: [{id: number; text: string; done: boolean}] = this.todo.tasks.filter((item)=>{
-                  if(item.id !== popup.id){
-                      return item
-                  }
-              });
-              this.todo.tasks = newTask;
-              localStorage.currentTodo = JSON.stringify(newTask);
+              this.todo.tasks = helper.deleteItem(this.todo.tasks,popup);
+              localStorage.currentTodo = JSON.stringify(this.todo.tasks);
              }
          }   
         },
@@ -99,8 +96,7 @@
                if(checkText.length>0){
                    this.checkTask = false;
                   const currentText: string = this.currentTask,
-                       currentDate = new Date(),
-                       id: number = currentDate.getTime()+2,
+                       id: number = helper.generateId(),
                        oldObj: [{id: number; text: string; done: boolean}] = this.todo.tasks,
                        newObj: [{id: number; text: string; done: boolean}] = {
                           id,
@@ -131,8 +127,7 @@
                 }else{
                     this.checkTitle = false;
                     this.checkTask = false;
-                    const currentDate = new Date(),
-                           id: number =  currentDate.getTime()+2;
+                    const id: number =  helper.generateId();
                     this.$store.dispatch('CreateTask',{id:id ,title: this.todo.title, tasks: this.todo.tasks});
                     localStorage.currentTodo = '';
                     this.todo = {
