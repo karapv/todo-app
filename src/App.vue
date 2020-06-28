@@ -9,7 +9,7 @@
 </style>
 
 <script>
-  import PopupConfirm from "@/components/popup-confirm/popup-confirm";
+  import PopupConfirm from "@/components/popup-confirm/PopupConfirm";
   export default {
     components: {PopupConfirm}
   }

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home/Home.vue'
 import Todo from "@/views/Todo/Todo.vue";
-import NotFound from "@/views/NotFound/NotFound";
+import NotFound from "@/views/NotFound/NotFound.vue";
 Vue.use(VueRouter);
 
   const routes: Array<RouteConfig> = [

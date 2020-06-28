@@ -10,9 +10,9 @@
     </div>
 </template>
 <style lang="sass">
-  @import "not-found"
+  @import "NotFound"
 </style>
-<script>
+<script lang="ts">
     import router from "@/router";
     export default {
         name: "NotFound",

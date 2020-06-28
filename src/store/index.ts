@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Vuex, {ActionContext} from 'vuex'
+import Vuex from 'vuex'
 
 Vue.use(Vuex);
 
@@ -16,8 +16,7 @@ export default new Vuex.Store({
     //Get todos
     getTodos: (state): { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] } => {
       if(typeof state.todos === 'string') {
-        const fromJson = JSON.parse(state.todos);
-        return fromJson;
+        return JSON.parse(state.todos);
       }else {
         return state.todos;
       }
@@ -29,19 +28,17 @@ export default new Vuex.Store({
     //Create task
     CreateTask:(state,todo): void=>{
       const oldTodo = typeof state.todos === 'string'?JSON.parse(state.todos):state.todos,
-            currentTodo = [...oldTodo,todo],
-            toJson = JSON.stringify(currentTodo);
-      localStorage.todos = toJson;
+            currentTodo = [...oldTodo,todo];
+        localStorage.todos = JSON.stringify(currentTodo);
       state.todos = localStorage.todos;
     },
     //Change Popup
-    changePopup: (state: [{enable: boolean; confirm: boolean; id: null}],popup: [{enable: boolean; confirm: boolean; id: null}]): void=>{
-      state.popup = popup;
+    changePopup: (state,popup: {enable: boolean; confirm: boolean; id: null}): void=>{
+        state.popup = popup;
     },
     //Remove Todo
     removeTodo: (state,todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
-      const toJson = JSON.stringify(todos);
-      localStorage.todos = toJson;
+        localStorage.todos = JSON.stringify(todos);
       state.todos = localStorage.todos;
     },
     //Do task is done
@@ -49,8 +46,7 @@ export default new Vuex.Store({
       const currentState = typeof state.todos === 'string'?JSON.parse(state.todos):state.todos,
             idx = currentState.findIndex((item)=>item.id === todo.id);
       currentState[idx] = todo;
-      const toJson = JSON.stringify(currentState);
-      localStorage.todos = toJson;
+      localStorage.todos = JSON.stringify(currentState);
       state.todos = localStorage.todos;
     }
   },

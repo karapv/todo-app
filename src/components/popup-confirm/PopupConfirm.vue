@@ -12,7 +12,7 @@
     </div>
 </template>
 <style lang="sass">
-  @import "popup-confirm"
+  @import "PopupConfirm"
 </style>
 <script lang="ts">
     import { mapGetters } from 'vuex';

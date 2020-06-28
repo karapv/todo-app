@@ -67,6 +67,7 @@
     import {mapGetters} from "vuex";
     import router from "@/router";
     import Helper from "@/helpers/helper";
+
     const helper = new Helper();
     export default {
         name: "Todo",
@@ -107,8 +108,7 @@
                 }
                 localStorage.version = this.version++;
                 const currentVersions = [{version: this.version, todos: this.currentTodo}];
-                const toJSON = JSON.stringify(currentVersions);
-                localStorage.versionsTodo = toJSON;
+                localStorage.versionsTodo = JSON.stringify(currentVersions);
             }
         },
         watch:{
@@ -187,13 +187,12 @@
                     const currentText: string = this.newTask,
                         id: number = helper.generateId(),
                         oldObj: [{id: number; text: string; done: boolean}] = this.currentTodo.tasks,
-                        newObj: [{id: number; text: string; done: boolean}] = {
+                        newObj: {id: number; text: string; done: boolean} = {
                             id,
                             text: currentText,
                             done: false
-                        },
-                        currentTask: [{id: number; text: string; done: boolean}] = [...oldObj,newObj];
-                    this.currentTodo.tasks = currentTask;
+                        };
+                    this.currentTodo.tasks = [...oldObj, newObj];
                     this.currentTask = '';
                 }else {
                     this.checkTask = true;

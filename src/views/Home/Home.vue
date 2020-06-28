@@ -7,9 +7,9 @@
 <style lang="sass">
   @import "Home"
 </style>
-<script>
-import TodoList from "@/components/todo-list/todo-list";
-import TodoForm from "@/components/todo-form/todo-form";
+<script lang="ts">
+import TodoList from "@/components/todo-list/TodoList.vue";
+import TodoForm from "@/components/todo-form/TodoForm.vue";
 export default {
   name: 'Home',
   components: {TodoForm, TodoList},

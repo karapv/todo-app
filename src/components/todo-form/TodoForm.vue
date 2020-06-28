@@ -41,11 +41,12 @@
     </div>
 </template>
 <style lang="sass">
-    @import "todo-form"
+    @import "TodoForm"
 </style>
 <script lang="ts">
     import {mapGetters} from "vuex";
     import Helper from "@/helpers/helper";
+
     const helper = new Helper();
     export default {
         name: 'TodoForm',
@@ -84,8 +85,7 @@
         },
         mounted(){
           if(localStorage.currentTodo){
-                const toJson = JSON.parse(localStorage.currentTodo);
-                this.todo.tasks = toJson;
+              this.todo.tasks = JSON.parse(localStorage.currentTodo);
           }
 
         },
@@ -98,12 +98,12 @@
                   const currentText: string = this.currentTask,
                        id: number = helper.generateId(),
                        oldObj: [{id: number; text: string; done: boolean}] = this.todo.tasks,
-                       newObj: [{id: number; text: string; done: boolean}] = {
+                       newObj: {id: number; text: string; done: boolean} = {
                           id,
                           text: currentText,
                           done: false
                       },
-                      currentTask: [{id: number; text: string; done: boolean}] = [...oldObj,newObj];
+                      currentTask = [...oldObj,newObj];
                   this.todo.tasks = currentTask;
                   localStorage.currentTodo = JSON.stringify(currentTask);
                   this.currentTask = '';

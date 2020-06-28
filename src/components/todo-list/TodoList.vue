@@ -22,7 +22,7 @@
     </div>
 </template>
 <style lang="sass">
-    @import "todo-list"
+    @import "TodoList"
 </style>
 <script lang="ts">
     import { mapGetters } from 'vuex';

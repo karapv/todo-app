@@ -9,7 +9,7 @@ export default class Helper {
     };
     //Helper for generate id
     generateId = () =>{
-        const currentDate: object = new Date();
+        const currentDate = new Date();
         return currentDate.getTime()+2;
     };
 }
