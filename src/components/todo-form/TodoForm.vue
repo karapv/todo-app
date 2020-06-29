@@ -97,11 +97,12 @@
                    this.checkTask = false;
                   const currentText: string = this.currentTask,
                        id: number = helper.generateId(),
-                       oldObj: [{id: number; text: string; done: boolean}] = this.todo.tasks,
-                       newObj: {id: number; text: string; done: boolean} = {
+                       oldObj: [{id: number; text: string; done: boolean; disabled: boolean}] = this.todo.tasks,
+                       newObj: {id: number; text: string; done: boolean; disabled: boolean} = {
                           id,
                           text: currentText,
-                          done: false
+                          done: false,
+                          disabled: true
                       },
                       currentTask = [...oldObj,newObj];
                   this.todo.tasks = currentTask;

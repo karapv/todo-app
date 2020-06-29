@@ -21,16 +21,16 @@
                         <p class="error" v-show="checkTitle">You must add a title.</p>
                     </b-form-group>
                     <div class="todo-btns-container">
-                        <span class="btns btn-change btn-todo btn-todo-change" @click="changeText('enableTitle',enableTitle)" v-b-tooltip.hover title="Change title"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                        <span class="btns btn-change btn-todo btn-todo-change" @click="enableTitle = !enableTitle" v-b-tooltip.hover title="Change title"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                     </div>
                 </div>
                 <ul class="task-list">
                         <li class="grid-container task-list-item" v-for="task in currentTodo.tasks" :key="task.id">
                             <span :class="{'task-check': true,'done': task.done,'btn-todo btn-todo-done': true}" @click="taskDone(task.id)" v-b-tooltip.hover title="Do task is done"><vue-fontawesome icon="check"></vue-fontawesome></span>
-                            <b-form-textarea type="text" :class="['task-text',`task-number-${task.id}`]" v-model="task.text" disabled></b-form-textarea>
+                            <b-form-textarea type="text" class="task-text" v-model="task.text" :disabled="task.disabled"></b-form-textarea>
                             <div class="todo-btns-container">
                                 <span class="btns btn-delete btn-todo btn-todo-delete" @click="deleteTask(task.id)" v-b-tooltip.hover title="Delete Task"><vue-fontawesome icon="trash"></vue-fontawesome></span>
-                                <span class="btns btn-change btn-todo btn-todo-change" @click="changeText(task.id)" v-b-tooltip.hover title="Change text in task"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
+                                <span class="btns btn-change btn-todo btn-todo-change" @click="task.disabled = !task.disabled" v-b-tooltip.hover title="Change text in task"><vue-fontawesome icon="pencil"></vue-fontawesome></span>
                             </div>
                         </li>
                 </ul>
@@ -151,8 +151,7 @@
             localStorage.version = this.version++;
             const oldVersion = JSON.parse(localStorage.versionsTodo);
             const newObj = [...oldVersion,{version:this.version,todos:this.currentTodo}];
-            const toJSON = JSON.stringify(newObj);
-            localStorage.versionsTodo = toJSON;
+            localStorage.versionsTodo = JSON.stringify(newObj);
         },
         methods:{
             //Back to home page
@@ -166,14 +165,6 @@
                  const idx = this.currentTodo.tasks.findIndex((item)=>item.id === id);
                  this.currentTodo.tasks[idx].done =  !this.currentTodo.tasks[idx].done;
             },
-            //Change text
-            changeText(property: string,value: boolean|string = 'disabled'): void{
-                if(value !== 'disabled') {
-                    this.$data[property] = !value;
-                }else{
-                    document.querySelector(`.task-number-${property}`).toggleAttribute('disabled');
-                }
-            },
             //Delete task
             deleteTask(id: number): void{
                 this.taskDelete = {id: id,delete: true};
@@ -186,11 +177,12 @@
                     this.checkTask = false;
                     const currentText: string = this.newTask,
                         id: number = helper.generateId(),
-                        oldObj: [{id: number; text: string; done: boolean}] = this.currentTodo.tasks,
-                        newObj: {id: number; text: string; done: boolean} = {
+                        oldObj: [{id: number; text: string; done: boolean; disabled: boolean}] = this.currentTodo.tasks,
+                        newObj: {id: number; text: string; done: boolean; disabled: boolean} = {
                             id,
                             text: currentText,
-                            done: false
+                            done: false,
+                            disabled: true
                         };
                     this.currentTodo.tasks = [...oldObj, newObj];
                     this.currentTask = '';

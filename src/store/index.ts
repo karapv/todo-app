@@ -6,15 +6,15 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     todos: localStorage.todos?localStorage.todos:[
-      {id: 1,title: 'Todo 1',tasks:[{id:1,text: 'My goal 1',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
-      {id: 2,title: 'Todo 2',tasks:[{id:1,text: 'My goal ',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
-      {id: 3,title: 'Todo 3',tasks:[{id:1,text: 'My goal 1',done: false},{id:2,text: 'My goal 2',done: false},{id:3,text: 'My goal',done: false},{id:4,text: 'My goal',done: false}]},
+      {id: 1,title: 'Todo 1',tasks:[{id:1,text: 'My goal 1',done: false, disabled: true},{id:2,text: 'My goal 2',done: false, disabled: true},{id:3,text: 'My goal',done: false, disabled: true},{id:4,text: 'My goal',done: false, disabled: true}]},
+      {id: 2,title: 'Todo 2',tasks:[{id:1,text: 'My goal ',done: false, disabled: true},{id:2,text: 'My goal 2',done: false, disabled: true},{id:3,text: 'My goal',done: false, disabled: true},{id:4,text: 'My goal',done: false, disabled: true}]},
+      {id: 3,title: 'Todo 3',tasks:[{id:1,text: 'My goal 1',done: false, disabled: true},{id:2,text: 'My goal 2',done: false, disabled: true},{id:3,text: 'My goal',done: false, disabled: true},{id:4,text: 'My goal',done: false, disabled: true}]},
     ],
     popup: {enable: false, confirm: false,id: null}
   },
   getters:{
     //Get todos
-    getTodos: (state): { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] } => {
+    getTodos: (state): { id: number; title: string; tasks: [{ id: number; text: string; done: boolean; disabled: boolean }] } => {
       if(typeof state.todos === 'string') {
         return JSON.parse(state.todos);
       }else {
@@ -37,7 +37,7 @@ export default new Vuex.Store({
         state.popup = popup;
     },
     //Remove Todo
-    removeTodo: (state,todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
+    removeTodo: (state,todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean; disabled: boolean }] })=>{
         localStorage.todos = JSON.stringify(todos);
       state.todos = localStorage.todos;
     },
@@ -52,7 +52,7 @@ export default new Vuex.Store({
   },
   actions: {
     //Create task
-    CreateTask:(content,todo: [{id: number; title: string; tasks: [{ id: number; text: string; done: boolean }]}]): void=>{
+    CreateTask:(content,todo: [{id: number; title: string; tasks: [{ id: number; text: string; done: boolean; disabled: boolean }]}]): void=>{
       content.commit('CreateTask',todo);
     },
     //Change Popup
@@ -60,7 +60,7 @@ export default new Vuex.Store({
       content.commit('changePopup',popup);
     },
     //Remove Todo
-    removeTodo: (content, todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean }] })=>{
+    removeTodo: (content, todos: { id: number; title: string; tasks: [{ id: number; text: string; done: boolean; disabled: boolean }] })=>{
       content.commit('removeTodo',todos);
     },
     //Save Todo
